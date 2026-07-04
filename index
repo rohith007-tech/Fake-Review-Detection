@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fake Review Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="center-wrapper">
+        <h3>
+            <span>FAKE!</span>
+            <span>REVIEW</span>
+            <span>DETECTION</span>
+        </h3>
+
+        <div class="container">
+            <h1>Fake Review Detection</h1>
+            <textarea id="review" placeholder="Enter your review here..."></textarea>
+            <button onclick="submitReview()">Check Review</button>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <!-- Four animated corner backgrounds -->
+    <div class="corner-div top-left"></div>
+    <div class="corner-div top-right"></div>
+    <div class="corner-div bottom-left"></div>
+    <div class="corner-div bottom-right"></div>
+
+    <script>
+        function submitReview() {
+            let review = document.getElementById('review').value.trim();
+
+            if (review === "") {
+                document.getElementById('result').innerHTML =
+                    `<p style="color: red;">Please enter a review. The review cannot be empty.</p>`;
+                return;
+            }
+
+            fetch('/classify', {
+                method: 'POST',
+                body: JSON.stringify({ review }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('result').innerHTML =
+                    `<p class="prediction">The review is: <span>${data.prediction.toUpperCase()}</span></p>
+                     <p class="confidence">Confidence Score: <span>${data.confidence}</span></p>`;
+            })
+            .catch(err => {
+                document.getElementById('result').innerHTML = `<p>Error: ${err}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>
+
